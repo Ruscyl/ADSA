@@ -3,15 +3,16 @@
 #include <math.h>
 using namespace std;
 
-string school_method_addition(string first_num, string second_num, int base)
+//school method for addition
+string addition(string first_num, string second_num, int base)
 {
 
 	int num1_len = first_num.size();
 	int num2_len = second_num.size();
-	int result_len = max(num1_len, num2_len) + 1; 
+	int result_len = max(num1_len, num2_len) + 1; //result has at most one more digit than input
 	string result_str;
 	int carry = 0;
-	
+	//add 0s in beginning to make length equal
 	if (num1_len < num2_len)
 	{
 		for (int i = 0; i < num2_len - num1_len; i++)
@@ -29,6 +30,7 @@ string school_method_addition(string first_num, string second_num, int base)
 		num2_len = num1_len;
 	}
 
+	//add one by one
 	for (int i = 0; i < result_len - 1; i++)
 	{
 		int num1, num2, curr_result;
@@ -50,6 +52,7 @@ string school_method_addition(string first_num, string second_num, int base)
 	}
 	result_str = to_string(carry) + result_str;
 
+	//remove all 0s in the beginning
 	int breakpoint = result_str.size();
 	for (int i = 0; i < breakpoint; i++)
 	{
@@ -67,7 +70,7 @@ string school_method_addition(string first_num, string second_num, int base)
 	return result_str;
 }
 
-string school_method_substraction(string first_num, string second_num, int base)
+string substraction(string first_num, string second_num, int base)
 {
 
 	int num1_len = first_num.size();
@@ -75,7 +78,7 @@ string school_method_substraction(string first_num, string second_num, int base)
 	int result_len = max(num1_len, num2_len);
 	string result_str="";
 	int carry = 0;
-
+	//add 0s in beginning to make length equal
 	if (num1_len < num2_len)
 	{
 		for (int i = 0; i < num2_len - num1_len; i++)
@@ -93,6 +96,7 @@ string school_method_substraction(string first_num, string second_num, int base)
 		num2_len = num1_len;
 	}
 
+	//add one by one
 	for (int i = 0; i < result_len; i++)
 	{
 		int num1, num2, curr_result;
@@ -112,6 +116,7 @@ string school_method_substraction(string first_num, string second_num, int base)
 		result_str = to_string(curr_result) + result_str;
 	}
 
+	//remove all 0s in the beginning
 	int breakpoint = result_str.size();
 	for (int i = 0; i < breakpoint; i++)
 	{
@@ -143,7 +148,7 @@ string convertBase(int number, int base, string result)
 }
 
 
-string kratsuba(string first_num, string second_num, int base)
+string Karatsuba(string first_num, string second_num, int base)
 {
 
 	int strlen1 = first_num.size();
@@ -163,6 +168,7 @@ string kratsuba(string first_num, string second_num, int base)
 		}
 	}
 
+	//return a string with base mutiplication
 	if (first_num.size() == 1 && second_num.size() == 1)
 	{
 		int num1 = first_num[0] - '0';
@@ -217,6 +223,7 @@ int main()
 	string first_num, second_num, base;
 	cin >> first_num >> second_num >> base;
 	int base_int = stoi(base);
-	cout << school_method_addition(first_num, second_num, base_int)<<" "<<kratsuba(first_num, second_num, base_int)<<endl;
+	// cout << substraction(first_num, second_num, base_int)<<endl;
+	cout << addition(first_num, second_num, base_int)<<" "<<Karatsuba(first_num, second_num, base_int)<<endl;
 	return 0;
 }
