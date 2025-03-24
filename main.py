@@ -1,92 +1,80 @@
-def convert_to_base_10(num_str, base):
-    """ Convert a number from base `base` to base 10 """
-    return int(num_str, base)
-
-def convert_from_base_10(num, base):
-    """ Convert a number from base 10 to the given base `base` """
-    if num == 0:
-        return "0"
-    digits = []
-    while num:
-        digits.append(int(num % base))
-        num //= base
-    return ''.join(str(x) for x in digits[::-1])
-
-def is_valid_digit_for_base(digit, base):
-    """ Checks if a digit is valid for the given base """
-    return 0 <= int(digit) < base
-
-def school_method_addition(a, b, base):
-    """ Add two numbers in base `base` using the school method """
-    a_str, b_str = str(a), str(b)
-    
-    # Check that all digits are valid for the base
-    for digit in a_str + b_str:
-        if not is_valid_digit_for_base(digit, base):
-            raise ValueError(f"Invalid digit '{digit}' for base {base}")
-    
-    max_len = max(len(a_str), len(b_str))
-    a_str = a_str.zfill(max_len)
-    b_str = b_str.zfill(max_len)
-    
+def add_school_method(i1, i2, base):
+    # Implement school method addition
     result = []
     carry = 0
+    i1 = list(map(int, reversed(i1)))
+    i2 = list(map(int, reversed(i2)))
     
-    for i in range(max_len - 1, -1, -1):
-        digit_sum = int(a_str[i], base) + int(b_str[i], base) + carry
-        result.append(str(digit_sum % base))
-        carry = digit_sum // base
+    max_len = max(len(i1), len(i2))
+    
+    for i in range(max_len):
+        digit1 = i1[i] if i < len(i1) else 0
+        digit2 = i2[i] if i < len(i2) else 0
+        sum_digits = digit1 + digit2 + carry
+        carry = sum_digits // base
+        result.append(sum_digits % base)
     
     if carry:
-        result.append(str(carry))
+        result.append(carry)
     
-    result.reverse()
-    return convert_from_base_10(int(''.join(result), base), base)
+    return ''.join(map(str, reversed(result)))
 
-def karatsuba(x, y):
-    """ Perform Karatsuba multiplication for two integers x and y """
-    if x < 10 or y < 10:
-        return x * y
+
+def karatsuba_multiply(i1, i2, base):
+    # Karatsuba multiplication in base 10
+    if len(i1) == 1 and len(i2) == 1:
+        return str(int(i1) * int(i2))
     
-    n = max(len(str(x)), len(str(y)))
+    n = max(len(i1), len(i2))
     half = n // 2
     
-    high1, low1 = divmod(x, 10**half)
-    high2, low2 = divmod(y, 10**half)
+    # Split the numbers
+    high1, low1 = i1[:-half], i1[-half:]
+    high2, low2 = i2[:-half], i2[-half:]
     
-    z0 = karatsuba(low1, low2)
-    z1 = karatsuba(low1 + high1, low2 + high2)
-    z2 = karatsuba(high1, high2)
+    # Recursively compute three products
+    z0 = karatsuba_multiply(low1, low2, base)
+    z1 = karatsuba_multiply(str(int(low1) + int(high1)), str(int(low2) + int(high2)), base)
+    z2 = karatsuba_multiply(high1, high2, base)
     
-    return (z2 * 10**(2 * half)) + ((z1 - z2 - z0) * 10**half) + z0
+    # Combine the three parts
+    product = int(z2) * base ** (2 * half) + (int(z1) - int(z2) - int(z0)) * base ** half + int(z0)
+    
+    return str(product)
 
-def perform_operations(I1, I2, B):
-    """ Perform the required operations: sum, product, and division """
-    I1_base_10 = convert_to_base_10(I1, B)
-    I2_base_10 = convert_to_base_10(I2, B)
-    
-    # 1. School Method Addition
-    sum_result = school_method_addition(I1_base_10, I2_base_10, B)
-    
-    # 2. Karatsuba Multiplication
-    product_result = karatsuba(I1_base_10, I2_base_10)
-    
-    # 3. Integer Division (rounded down)
-    division_result = I1_base_10 // I2_base_10
-    
-    # Convert results to base B
-    sum_result_base_B = convert_from_base_10(sum_result, B)
-    product_result_base_B = convert_from_base_10(product_result, B)
-    division_result_base_B = convert_from_base_10(division_result, B)
-    
-    return f"{sum_result_base_B} {product_result_base_B} {division_result_base_B}"
 
-# Main function to process input and output the results
+def divide_integer(i1, i2, base):
+    # Integer division
+    return str(int(i1) // int(i2))
+
+
+def to_base_b(num_str, base):
+    # Convert a number string to base `b`
+    num = int(num_str)
+    if num == 0:
+        return "0"
+    result = []
+    while num:
+        result.append(str(num % base))
+        num //= base
+    return ''.join(reversed(result))
+
+
+def main():
+    i1, i2, base = input().split()
+    base = int(base)
+    
+    # Step 1: Perform school method addition
+    addition_result = add_school_method(i1, i2, base)
+    
+    # Step 2: Perform Karatsuba multiplication
+    multiplication_result = karatsuba_multiply(i1, i2, base)
+    
+    # Step 3: Perform integer division (only for postgraduates)
+    division_result = divide_integer(i1, i2, base)
+    
+    # Convert results to the correct base and print
+    print(to_base_b(addition_result, base), to_base_b(multiplication_result, base), to_base_b(division_result, base))
+
 if __name__ == "__main__":
-    # Read the input
-    I1, I2, B = input().split()
-    B = int(B)
-    
-    # Perform operations and print results
-    result = perform_operations(I1, I2, B)
-    print(result)
+    main()
