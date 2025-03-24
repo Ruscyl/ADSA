@@ -3,7 +3,7 @@
 #include <math.h>
 using namespace std;
 
-string addition(string first_num, string second_num, int base)
+string school_method_addition(string first_num, string second_num, int base)
 {
 
 	int num1_len = first_num.size();
@@ -67,7 +67,7 @@ string addition(string first_num, string second_num, int base)
 	return result_str;
 }
 
-string substraction(string first_num, string second_num, int base)
+string school_method_school_method_substraction(string first_num, string second_num, int base)
 {
 
 	int num1_len = first_num.size();
@@ -143,7 +143,7 @@ string convertBase(int number, int base, string result)
 }
 
 
-string Karatsuba(string first_num, string second_num, int base)
+string karatsuba(string first_num, string second_num, int base)
 {
 
 	int strlen1 = first_num.size();
@@ -181,19 +181,19 @@ string Karatsuba(string first_num, string second_num, int base)
 		string b0 = second_num.substr(mid, second_num.size() - mid);
 		int k = first_num.size() - mid;
 		
-		string a1b1 = Karatsuba(a1, b1,base);
-		string a1_a0 = addition(a1, a0, base);
-		string b1_b0 = addition(b1, b0, base);
-		string a0b0 =Karatsuba(a0, b0, base);
+		string a1b1 = karatsuba(a1, b1,base);
+		string a1_a0 = school_method_addition(a1, a0, base);
+		string b1_b0 = school_method_addition(b1, b0, base);
+		string a0b0 = karatsuba(a0, b0, base);
 
 		string part1 = a1b1;
 		for (int i =0;i<2*k;i++){
 			part1 =part1 +"0";
 		}
 
-		string part2 = Karatsuba(a1_a0, b1_b0, base);
-		string part3 = addition(a1b1, a0b0,base);
-		string part_mid = substraction(part2,part3,base);
+		string part2 = karatsuba(a1_a0, b1_b0, base);
+		string part3 = school_method_addition(a1b1, a0b0,base);
+		string part_mid = school_method_substraction(part2,part3,base);
 		for (int i =0;i<k;i++){
 			part_mid =part_mid +"0";
 		}
@@ -201,8 +201,8 @@ string Karatsuba(string first_num, string second_num, int base)
 		string part4 = a0b0;
 
 		string result = part1;
-		result = addition(result,part_mid,base);
-		result = addition(result,part4,base);
+		result = school_method_addition(result,part_mid,base);
+		result = school_method_addition(result,part4,base);
 		return result;
 
 	}
@@ -217,6 +217,6 @@ int main()
 	string first_num, second_num, base;
 	cin >> first_num >> second_num >> base;
 	int base_int = stoi(base);
-	cout << addition(first_num, second_num, base_int)<<" "<<Karatsuba(first_num, second_num, base_int)<<endl;
+	cout << school_method_addition(first_num, second_num, base_int)<<" "<<karatsuba(first_num, second_num, base_int)<<endl;
 	return 0;
 }
