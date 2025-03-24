@@ -67,7 +67,7 @@ string school_method_addition(string first_num, string second_num, int base)
 	return result_str;
 }
 
-string school_method_school_method_substraction(string first_num, string second_num, int base)
+string school_method_substraction(string first_num, string second_num, int base)
 {
 
 	int num1_len = first_num.size();
