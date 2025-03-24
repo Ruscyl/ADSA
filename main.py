@@ -12,9 +12,19 @@ def convert_from_base_10(num, base):
         num //= base
     return ''.join(str(x) for x in digits[::-1])
 
+def is_valid_digit_for_base(digit, base):
+    """ Checks if a digit is valid for the given base """
+    return 0 <= int(digit) < base
+
 def school_method_addition(a, b, base):
     """ Add two numbers in base `base` using the school method """
     a_str, b_str = str(a), str(b)
+    
+    # Check that all digits are valid for the base
+    for digit in a_str + b_str:
+        if not is_valid_digit_for_base(digit, base):
+            raise ValueError(f"Invalid digit '{digit}' for base {base}")
+    
     max_len = max(len(a_str), len(b_str))
     a_str = a_str.zfill(max_len)
     b_str = b_str.zfill(max_len)
