@@ -5,15 +5,17 @@
 #include <algorithm>
 using namespace std;
 
+// Convert letter to cost
 int letter_to_cost(char c) {
     return (c >= 'A' && c <= 'Z') ? (c - 'A') : (c - 'a' + 26);
 }
 
+// Disjoint Set Union
 struct DSU {
     vector<int> parent;
     DSU(int n) {
         parent.resize(n);
-        for(int i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
             parent[i] = i;
     }
     int find(int x) {
@@ -37,6 +39,7 @@ int main() {
     int n = 1;
     for (char c : country_input)
         if (c == ',') ++n;
+
     country.resize(n);
     build.resize(n);
     destroy.resize(n);
@@ -62,39 +65,36 @@ int main() {
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
             if (country[i][j] == '1') {
-                edges.emplace_back(0, i, j, "existing", destroy[i][j]);
+                // Two choices: keep (0 cost) or destroy (destruction cost)
+                edges.emplace_back(0, i, j, "keep", destroy[i][j]);
+                edges.emplace_back(letter_to_cost(destroy[i][j]), i, j, "destroy", '-');
             } else {
-                int cost = letter_to_cost(build[i][j]);
-                edges.emplace_back(cost, i, j, "build", '-');
+                // Only one choice: build it
+                edges.emplace_back(letter_to_cost(build[i][j]), i, j, "build", '-');
             }
         }
     }
 
+    // Sort all edges by cost ascending
     sort(edges.begin(), edges.end());
 
     DSU dsu(n);
     int total_cost = 0;
-    vector<vector<bool>> used(n, vector<bool>(n, false));
 
     for (auto& edge : edges) {
         int cost, u, v;
         string type;
-        char destroy_ch;
-        tie(cost, u, v, type, destroy_ch) = edge;
+        char dummy;
+        tie(cost, u, v, type, dummy) = edge;
 
-        if (dsu.unite(u, v)) {
-            if (type == "build") {
+        if (type == "keep" || type == "build") {
+            if (dsu.unite(u, v)) {
                 total_cost += cost;
-            } else if (type == "existing") {
-                used[u][v] = used[v][u] = true;
             }
-        }
-    }
-
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            if (country[i][j] == '1' && !used[i][j]) {
-                total_cost += letter_to_cost(destroy[i][j]);
+        } else if (type == "destroy") {
+            if (dsu.find(u) == dsu.find(v)) {
+                // Already connected, so we must destroy it
+                total_cost += cost;
             }
         }
     }
