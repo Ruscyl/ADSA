@@ -9,11 +9,12 @@ class DSU:
             self.parent[x] = self.find(self.parent[x])
         return self.parent[x]
     def union(self, x, y):
-        xroot, yroot = self.find(x), self.find(y)
-        if xroot != yroot:
-            self.parent[xroot] = yroot
-            return True
-        return False
+        xroot = self.find(x)
+        yroot = self.find(y)
+        if xroot == yroot:
+            return False
+        self.parent[xroot] = yroot
+        return True
 
 def main():
     country_str, build_str, destroy_str = input().strip().split()
@@ -22,32 +23,23 @@ def main():
     destroy = destroy_str.split(',')
     n = len(country)
 
-    edges = [] 
-    used_existing_edges = set()
+    dsu = DSU(n)
+    total_cost = 0
+    build_edges = []
 
     for i in range(n):
         for j in range(i + 1, n):
             if country[i][j] == '1':
-                edges.append((0, i, j, 'existing'))
+                if not dsu.union(i, j): 
+                    total_cost += letter_to_cost(destroy[i][j])
             else:
-                cost = letter_to_cost(build[i][j])
-                edges.append((cost, i, j, 'new'))
+                build_cost = letter_to_cost(build[i][j])
+                build_edges.append((build_cost, i, j))
 
-    edges.sort()
-    dsu = DSU(n)
-    total_cost = 0
-
-    for cost, u, v, typ in edges:
+    build_edges.sort()
+    for cost, u, v in build_edges:
         if dsu.union(u, v):
-            if typ == 'new':
-                total_cost += cost
-            else:
-                used_existing_edges.add((u, v))
-
-    for i in range(n):
-        for j in range(i + 1, n):
-            if country[i][j] == '1' and (i, j) not in used_existing_edges:
-                total_cost += letter_to_cost(destroy[i][j])
+            total_cost += cost
 
     print(total_cost)
 
