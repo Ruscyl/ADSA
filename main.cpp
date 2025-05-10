@@ -5,12 +5,10 @@
 #include <algorithm>
 using namespace std;
 
-// Convert letter to cost
 int letter_to_cost(char c) {
     return (c >= 'A' && c <= 'Z') ? (c - 'A') : (c - 'a' + 26);
 }
 
-// Disjoint Set Union
 struct DSU {
     vector<int> parent;
     DSU(int n) {
@@ -60,41 +58,35 @@ int main() {
         else destroy[idx] += c;
     }
 
-    vector<tuple<int, int, int, string, char>> edges;
+    vector<tuple<int, int, int, bool, int>> edges; // cost, u, v, is_build, destroy_cost
 
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
             if (country[i][j] == '1') {
-                // Two choices: keep (0 cost) or destroy (destruction cost)
-                edges.emplace_back(0, i, j, "keep", destroy[i][j]);
-                edges.emplace_back(letter_to_cost(destroy[i][j]), i, j, "destroy", '-');
+                edges.emplace_back(0, i, j, false, letter_to_cost(destroy[i][j])); // existing edge
             } else {
-                // Only one choice: build it
-                edges.emplace_back(letter_to_cost(build[i][j]), i, j, "build", '-');
+                edges.emplace_back(letter_to_cost(build[i][j]), i, j, true, 0);     // buildable edge
             }
         }
     }
 
-    // Sort all edges by cost ascending
+    // Sort all edges by cost
     sort(edges.begin(), edges.end());
 
     DSU dsu(n);
     int total_cost = 0;
 
     for (auto& edge : edges) {
-        int cost, u, v;
-        string type;
-        char dummy;
-        tie(cost, u, v, type, dummy) = edge;
+        int cost, u, v, destroy_cost;
+        bool is_build;
+        tie(cost, u, v, is_build, destroy_cost) = edge;
 
-        if (type == "keep" || type == "build") {
-            if (dsu.unite(u, v)) {
-                total_cost += cost;
-            }
-        } else if (type == "destroy") {
-            if (dsu.find(u) == dsu.find(v)) {
-                // Already connected, so we must destroy it
-                total_cost += cost;
+        if (dsu.unite(u, v)) {
+            total_cost += cost;
+        } else {
+            // If this is an existing edge forming a cycle, we must destroy it
+            if (!is_build) {
+                total_cost += destroy_cost;
             }
         }
     }
