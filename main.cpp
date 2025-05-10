@@ -13,12 +13,10 @@ struct DSU {
     vector<int> parent;
     DSU(int n) {
         parent.resize(n);
-        for (int i = 0; i < n; ++i)
-            parent[i] = i;
+        for (int i = 0; i < n; ++i) parent[i] = i;
     }
     int find(int x) {
-        if (parent[x] != x)
-            parent[x] = find(parent[x]);
+        if (parent[x] != x) parent[x] = find(parent[x]);
         return parent[x];
     }
     bool unite(int x, int y) {
@@ -58,33 +56,31 @@ int main() {
         else destroy[idx] += c;
     }
 
-    vector<tuple<int, int, int, bool, int>> edges; // cost, u, v, is_build, destroy_cost
+    vector<tuple<int, int, int, bool, int>> edges;
 
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
             if (country[i][j] == '1') {
-                edges.emplace_back(0, i, j, false, letter_to_cost(destroy[i][j])); // existing edge
+                edges.emplace_back(0, i, j, false, letter_to_cost(destroy[i][j]));
             } else {
-                edges.emplace_back(letter_to_cost(build[i][j]), i, j, true, 0);     // buildable edge
+                edges.emplace_back(letter_to_cost(build[i][j]), i, j, true, 0);
             }
         }
     }
 
-    // Sort all edges by cost
     sort(edges.begin(), edges.end());
 
     DSU dsu(n);
     int total_cost = 0;
 
-    for (auto& edge : edges) {
+    for (auto& e : edges) {
         int cost, u, v, destroy_cost;
         bool is_build;
-        tie(cost, u, v, is_build, destroy_cost) = edge;
+        tie(cost, u, v, is_build, destroy_cost) = e;
 
         if (dsu.unite(u, v)) {
             total_cost += cost;
         } else {
-            // If this is an existing edge forming a cycle, we must destroy it
             if (!is_build) {
                 total_cost += destroy_cost;
             }
